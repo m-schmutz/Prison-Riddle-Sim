@@ -1,12 +1,14 @@
 #!/bin/python3
-import multiprocessing
 from random import SystemRandom
-from multiprocessing import Process, Value
+from multiprocessing import Process, Value, RLock
+from lib.progressbar import ProgressBar
 from psutil import cpu_count
 import time
 
 SUCCESS = True
 FAIL = False
+
+SECONDS_IN_MIN = 60
 
 ##########################################################################################
 # template for the boxes
@@ -74,10 +76,10 @@ def trial():
 ##########################################################################################
 
 ##########################################################################################
-def process_driver(thread_trials, total_successes):
+def process_driver(process_trials, progress, mutex, total_successes):
     successes = 0
     # simulate the number of trials given by the user
-    for _ in range(thread_trials):
+    for _ in range(process_trials):
 
         # run a trial and get the result
         result = trial()
@@ -85,19 +87,19 @@ def process_driver(thread_trials, total_successes):
         # if the trial succeeds, increment successes
         if result:
             successes += 1
+        mutex.acquire()
+        progress.value += 1
+        mutex.release()
+        
     total_successes.value += successes
     return
-    
 ##########################################################################################
-
-
 
 ##########################################################################################
 # this function 
 def simulation(trials):
-
-    # print the number of trials that are being simulating
-    print(f'Simulating {trials} trials')
+    # initialize the progress bar
+    pb = ProgressBar(total=trials, title='Simulation in Progress...', titleoncomplete='Simulation Complete', left='', right='', fill_char='█', empty_char='░')
     
     # get the number of CPU cores 
     num_cores = cpu_count(logical=False)
@@ -110,30 +112,53 @@ def simulation(trials):
 
     total_successes = Value('i', 0)
 
+    progress = Value('i', 0, lock=False)
+
+    progress_mutex = RLock()
+
     procs = []
     for core in range(num_cores):
         if remaining:
-            procs.append(Process(target=process_driver, args=(process_trials + 1, total_successes)))
+            procs.append(Process(target=process_driver, args=(process_trials + 1, progress, progress_mutex, total_successes)))
             procs[core].start()
+            remaining -= 1
+        
+        else:
+            procs.append(Process(target=process_driver, args=(process_trials, progress, progress_mutex, total_successes)))
+            procs[core].start()
+
+    while True:
+        pb.update(progress.value)
+
+        if progress.value == trials:
+            pb.update(trials)
+            break
 
     for p in procs:
         p.join()
 
-    return int(total_successes.value)
-    
-    
+    return total_successes.value
 ##########################################################################################
 
 ##########################################################################################
 # this function returns the success rate of the simulation
-def print_results(trials, total_successes,t1, t2):
+def print_results(trials, total_successes, t1, t2):
+    elapsed_time = t2 - t1
+
+    mins = int(elapsed_time // SECONDS_IN_MIN)
+
+    remaining_secs = elapsed_time - (mins * SECONDS_IN_MIN)
+
+
+
     success_rate = (total_successes/trials) * 100
     print('**********************************************************************************************************')
     print(f'The prisoners succeeded {total_successes} times in {trials} trials with a success rate of {success_rate}%')
-    print(f'simulation completed in {t2 - t1} seconds')
+    print(f'Total Elapsed Time: {mins} minutes {remaining_secs:.3f} seconds')
     print('**********************************************************************************************************')
 ##########################################################################################
 
+##########################################################################################
 if __name__ == '__main__':
     trials = get_num_trials()
 
