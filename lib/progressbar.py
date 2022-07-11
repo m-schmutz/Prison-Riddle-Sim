@@ -124,7 +124,7 @@ class ProgressBar:
         print(self._progressbar, end='')
         ###
         # this was added because for some reason the progress bar doesnt work without it
-        time.sleep(.00000001)
+        time.sleep(.00001)
         return
 
 # import time
