@@ -1,6 +1,6 @@
 #!/bin/python3
 from random import SystemRandom
-from multiprocessing import Process, Value, RLock
+from multiprocessing import Process, Value, Array
 from lib.progressbar import ProgressBar
 from psutil import cpu_count
 import time
@@ -76,7 +76,7 @@ def trial():
 ##########################################################################################
 
 ##########################################################################################
-def process_driver(process_trials, progress, mutex, total_successes):
+def process_driver(process_trials, progress_arr, index, total_successes):
     successes = 0
     # simulate the number of trials given by the user
     for _ in range(process_trials):
@@ -87,9 +87,8 @@ def process_driver(process_trials, progress, mutex, total_successes):
         # if the trial succeeds, increment successes
         if result:
             successes += 1
-        mutex.acquire()
-        progress.value += 1
-        mutex.release()
+        
+        progress_arr[index] += 1
         
     total_successes.value += successes
     return
@@ -101,8 +100,8 @@ def simulation(trials):
     # initialize the progress bar
     pb = ProgressBar(total=trials, title='Simulation in Progress...', titleoncomplete='Simulation Complete', left='', right='', fill_char='█', empty_char='░')
     
-    # get the number of CPU cores 
-    num_cores = cpu_count(logical=False)
+    # get the number of CPU cores; leave one for this original process 
+    num_cores = cpu_count(logical=False) - 1
 
     # using integer division, get the base amount that each process will do 
     process_trials = trials // num_cores
@@ -110,27 +109,28 @@ def simulation(trials):
     # get the remainder, if any
     remaining = trials % num_cores  
 
+    # total successes variable that will be passed to each process
+    # each process will add its successes to this variable
     total_successes = Value('i', 0)
 
-    progress = Value('i', 0, lock=False)
-
-    progress_mutex = RLock()
+    # array that will contain the progress of each process 
+    progress_arr = Array('i', num_cores, lock=False)
 
     procs = []
     for core in range(num_cores):
         if remaining:
-            procs.append(Process(target=process_driver, args=(process_trials + 1, progress, progress_mutex, total_successes)))
+            procs.append(Process(target=process_driver, args=(process_trials + 1, progress_arr, core, total_successes)))
             procs[core].start()
             remaining -= 1
         
         else:
-            procs.append(Process(target=process_driver, args=(process_trials, progress, progress_mutex, total_successes)))
+            procs.append(Process(target=process_driver, args=(process_trials, progress_arr, core, total_successes)))
             procs[core].start()
 
     while True:
-        pb.update(progress.value)
+        pb.update(sum(progress_arr[:]))
 
-        if progress.value == trials:
+        if sum(progress_arr[:]) == trials:
             pb.update(trials)
             break
 
@@ -143,14 +143,17 @@ def simulation(trials):
 ##########################################################################################
 # this function returns the success rate of the simulation
 def print_results(trials, total_successes, t1, t2):
+
+    # get the elapsed time
     elapsed_time = t2 - t1
 
+    # find the amount of minutes that have passed
     mins = int(elapsed_time // SECONDS_IN_MIN)
 
+    # find the remaining seconds
     remaining_secs = elapsed_time - (mins * SECONDS_IN_MIN)
 
-
-
+    # calculate the success rate of the trials
     success_rate = (total_successes/trials) * 100
     print('**********************************************************************************************************')
     print(f'The prisoners succeeded {total_successes} times in {trials} trials with a success rate of {success_rate}%')
@@ -165,4 +168,5 @@ if __name__ == '__main__':
     t1 = time.perf_counter()
     total_successes = simulation(trials)
     t2 = time.perf_counter()
+
     print_results(trials, total_successes, t1, t2)
