@@ -4,3 +4,4 @@ from sys import path
 path.append('./lib')
 
 from simulation import *
+from ansi import ansi

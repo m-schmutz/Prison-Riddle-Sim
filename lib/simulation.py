@@ -181,11 +181,3 @@ def run_simulation(trials:int) -> None:
     print_results(trials, total_successes, t1, t2)
 ##########################################################################################
 
-
-
-
-
-
-
-
-
