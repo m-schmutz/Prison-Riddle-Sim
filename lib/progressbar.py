@@ -1,5 +1,5 @@
-import lib.ansi as ansi
-import time
+import ansi
+from time import sleep
 
 class ProgressBar:
     def __init__(self, total:float=100, width:int=64, fill_char:str='#', empty_char:str='-', left:str='[',
@@ -124,7 +124,7 @@ class ProgressBar:
         print(self._progressbar, end='')
         ###
         # this was added because for some reason the progress bar doesnt work without it
-        time.sleep(.00001)
+        sleep(.00001)
         return
 
 # import time
