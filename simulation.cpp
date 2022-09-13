@@ -99,7 +99,7 @@ unsigned int thread_driver(const int trials)
 int main()
 {
     
-    int trials = 10000;
+    int trials = 100000;
 
     auto start = std::chrono::high_resolution_clock::now();
     int total_successes = thread_driver(trials);
@@ -117,7 +117,7 @@ int main()
 
     cout << "**********************************************************************************************************\n";
     cout << "The prisoners succeeded " << total_successes << " times out of " << trials << " trials\n";
-    cout << "Success rate = " << success_rate << " %\n";
+    cout << "Success rate = " << success_rate << "%\n";
     cout << "Total elapsed time " << mins << " minutes " << secs << " seconds\n";
     cout << "**********************************************************************************************************\n";
 

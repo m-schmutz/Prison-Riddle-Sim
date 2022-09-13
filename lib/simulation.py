@@ -1,7 +1,5 @@
 from random import SystemRandom
-from multiprocessing import Pool, Pipe, cpu_count
-from multiprocessing.connection import wait
-from progressbar import ProgressBar
+from multiprocessing import Pool, Array, cpu_count
 from time import perf_counter
 
 __all__ = ['get_num_trials', 'run_simulation']
@@ -13,6 +11,12 @@ FAIL = False
 
 # seconds in a minute
 SECONDS_IN_MIN = 60
+
+# get the number of processes based on cpu_count
+NUM_PROCS = cpu_count()
+
+# initalize an array for progress tracking
+progress_arr = Array('i', NUM_PROCS, lock=False)
 
 ##########################################################################################
 # template for the boxes
@@ -34,6 +38,7 @@ def get_num_trials() -> int:
             assert(trials > 0)
 
             return trials
+        
         except ValueError:
             # berate user for entering something that isn't a number
             print('enter a number you moron')
@@ -87,21 +92,20 @@ def trial() -> bool:
 
 ##########################################################################################
 def process_driver(args) -> int:
-    # extract number of trials and pipe
-    trials, pipe = args
+    trials, ind = args
 
     # initialize successes to 0
     successes = 0
 
     # go through each trial for this process
-    for _ in range(trials):
+    for i in range(trials):
 
         # if trial returns true, it was a success
         if trial():
             successes += 1
-
-        # send progress through pipe
-        pipe.send(1)
+        
+        progress_arr[ind] = i + 1
+        
 
     # return the number of successes for this process
     return successes
@@ -123,64 +127,52 @@ def print_results(trials, total_successes, t1, t2) -> None:
     # calculate the success rate of the trials
     success_rate = (total_successes/trials) * 100
     print('**********************************************************************************************************')
-    print(f'The prisoners succeeded {total_successes} times out of {trials} trials with a success rate of {success_rate}%')
+    print(f'The prisoners succeeded {total_successes} times out of {trials} trials with a success rate of {success_rate:.3f}%')
     print(f'Total Elapsed Time: {mins} minutes {remaining_secs:.3f} seconds')
     print('**********************************************************************************************************')
 ##########################################################################################
 
 ##########################################################################################
 def run_simulation(trials:int) -> None:
-    # initialize the progress bar
-    pb = ProgressBar(total=trials, title=f'Simulation in Progress...', titleoncomplete='Simulation Complete', left='', right='', fill_char='█', empty_char='░')
-
-    # get the number of processes to use based on the cpu count
-    num_processes = 12
-
     # get the max number of trials per process
-    trials_per_process = trials // num_processes
+    trials_per_process = trials // NUM_PROCS
 
     # get the remainder left over from previous step
-    remainder = trials % num_processes
+    remainder = trials % NUM_PROCS
 
     # get the list of trials per process
-    distro = [trials_per_process + 1] * remainder + [trials_per_process] * (num_processes - remainder)
+    distro = [trials_per_process + 1] * remainder + [trials_per_process] * (NUM_PROCS - remainder)
 
-    # initialize the lists that will contain the pipe endpoints
-    send_ends = list()
-    recv_ends = list()
-
-    # populate the lists of pipes
-    for _ in range(num_processes):
-        r, s = Pipe(duplex=False)
-        recv_ends.append(r)
-        send_ends.append(s)
-
-
-    # initalize progress
-    progress = 0
-
+    # set cursor as invisible
+    print('\033[?25l')
+    
     # start perf counter
     t1 = perf_counter()
     
     # start processor pool and execute the simulation
-    with Pool(processes=num_processes) as pool:\
+    with Pool(processes=NUM_PROCS) as pool:
         # start each of the processes
-        results = pool.map_async(process_driver, zip(distro, send_ends)) 
+        results = pool.map_async(process_driver, zip(distro, range(NUM_PROCS)))
 
         # while simulation is not done, update the progress bar
         while True:
-            progress += sum([p.recv() for p in wait(recv_ends, timeout=.1)])
+            # get the current state of the sim
+            done = sum(progress_arr)
 
-            # update the progress bar
-            pb.update(progress)
+            # print out progress with percentage
+            print(f'\033[1F{done} / {trials} | {done/trials*100:.2f}%')
 
-            # if progress is equal to the number of trials, simulation is done
-            if progress == trials:
+            # check if sim is done
+            if sum(progress_arr) == trials:
+                print(f'\033[1F{sum(progress_arr)} / {trials} | {sum(progress_arr)/trials*100:.2f}%')
                 break
     
     # end perf counter
     t2 = perf_counter()
-
+    
+    # set cursor as visible again and clear ansi
+    print('\033[?25h\033[0m')
+    
     # get the total number of successes
     total_successes = sum(results.get())
 

@@ -7,8 +7,7 @@ if __name__ == '__main__':
 
     # print out warning message
     if trials >= 100000:
-        msg = ansi('WARNING: For trial counts over 100,000 recommend using C++ implementation')
-        print(msg.yellow())
+        print('\033[33mWARNING: Recommend using C++ implementation for trials counts over 100,000\033[0m')
 
     # run the simulation
     run_simulation(trials)
