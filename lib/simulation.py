@@ -30,10 +30,17 @@ def get_num_trials() -> int:
         try:
             # check that string entered is a number
             trials = int(trials)
+
+            assert(trials > 0)
+
             return trials
-        except:
-            # berate them for entering something that isn't a number
+        except ValueError:
+            # berate user for entering something that isn't a number
             print('enter a number you moron')
+        
+        except AssertionError:
+            # berate user for entering a negative number
+            print('can\'t simulate negative number of trials you idiot')
 ##########################################################################################
 
 ##########################################################################################
@@ -127,7 +134,7 @@ def run_simulation(trials:int) -> None:
     pb = ProgressBar(total=trials, title=f'Simulation in Progress...', titleoncomplete='Simulation Complete', left='', right='', fill_char='█', empty_char='░')
 
     # get the number of processes to use based on the cpu count
-    num_processes = cpu_count()
+    num_processes = 12
 
     # get the max number of trials per process
     trials_per_process = trials // num_processes
