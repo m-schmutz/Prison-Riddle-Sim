@@ -294,7 +294,7 @@ int get_num_trials()
     }
 }
 
-
+// main function to run simulation and print results
 int main()
 {
     // get the number of trials that the user wants to simulate
