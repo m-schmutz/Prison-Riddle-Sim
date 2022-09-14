@@ -1,5 +1,5 @@
 #!/bin/python3
-from lib import *
+from lib.simulation import *
 
 if __name__ == '__main__':
     # get the number of trials to run
@@ -11,4 +11,3 @@ if __name__ == '__main__':
 
     # run the simulation
     run_simulation(trials)
-
