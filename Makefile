@@ -1,9 +1,9 @@
 CC=g++
-FLAGS=-std=c++11 -Wall
+FLAGS=-std=c++11 -Wall -pthread
 EXE=faster_sim
 
-all: simulation.cpp
-	$(CC) $(FLAGS) simulation.cpp -o $(EXE)
+all: lib/simulation.cpp
+	$(CC) $(FLAGS) lib/simulation.cpp -o $(EXE)
 
 clean: 
 	rm $(EXE)

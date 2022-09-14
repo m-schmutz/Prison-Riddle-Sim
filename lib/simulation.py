@@ -35,8 +35,10 @@ def get_num_trials() -> int:
             # check that string entered is a number
             trials = int(trials)
 
+            # assert the the number is a positive integer
             assert(trials > 0)
 
+            # return the number
             return trials
         
         except ValueError:
@@ -44,8 +46,12 @@ def get_num_trials() -> int:
             print('enter a number you moron')
         
         except AssertionError:
+            # berate user for asking for 0 trials
+            if trials == 0:
+                print('\"sImUlAtE 0 tRiAlS\" you\'re not funny')
             # berate user for entering a negative number
-            print('can\'t simulate negative number of trials you idiot')
+            else:
+                print('can\'t simulate negative number of trials you idiot')
 ##########################################################################################
 
 ##########################################################################################
@@ -127,8 +133,10 @@ def print_results(trials, total_successes, t1, t2) -> None:
     # calculate the success rate of the trials
     success_rate = (total_successes/trials) * 100
     print('**********************************************************************************************************')
-    print(f'The prisoners succeeded {total_successes} times out of {trials} trials with a success rate of {success_rate:.3f}%')
-    print(f'Total Elapsed Time: {mins} minutes {remaining_secs:.3f} seconds')
+    print('Language used: Python')
+    print(f'The prisoners succeeded {total_successes} times out of {trials} trials') 
+    print(f'Success rate: {success_rate:.3f}%')
+    print(f'Total elapsed Time: {mins} minutes {remaining_secs:.3f} seconds')
     print('**********************************************************************************************************')
 ##########################################################################################
 
@@ -163,8 +171,7 @@ def run_simulation(trials:int) -> None:
             print(f'\033[1F{done} / {trials} | {done/trials*100:.2f}%')
 
             # check if sim is done
-            if sum(progress_arr) == trials:
-                print(f'\033[1F{sum(progress_arr)} / {trials} | {sum(progress_arr)/trials*100:.2f}%')
+            if done == trials:
                 break
     
     # end perf counter
@@ -179,4 +186,3 @@ def run_simulation(trials:int) -> None:
     # print the results of the simulation
     print_results(trials, total_successes, t1, t2)
 ##########################################################################################
-
