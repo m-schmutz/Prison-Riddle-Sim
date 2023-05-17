@@ -1,5 +1,6 @@
 use rand::seq::SliceRandom;
 use std::collections::HashSet;
+use std::io;
 
 /******************************************************************
 This function takes in a vector representing the boxes and a
@@ -43,6 +44,7 @@ fn discover_chain(boxes: &Vec<i8>, index: i8, visited_boxes: &mut HashSet<i8>) -
     return length;
 }
 
+
 /******************************************************************
 This function takes in a vector representing the boxes and returns
 true if the prisoners will win the game or false if they will not
@@ -72,20 +74,90 @@ fn check_shuffle(boxes: Vec<i8>) -> bool {
 }
 
 
+/******************************************************************
+This function gets input from the user and returns a Result
+that is either a u32 or the invalid string that the user entered
+******************************************************************/
+fn get_input() -> Result<u32, String> {
+    // prompt the user
+    println!("Enter the number of trials that you want to simulate");
+    
+    // create new string
+    let mut input = String::new();
+
+    // read input and handle possible error
+    io::stdin().read_line(&mut input)
+        .expect("Failed to read input");
+
+    // return Result that is either the u32 number
+    // or the input as a string if it is invalid
+    match input.trim().parse() {
+        Ok(trials) => Ok(trials),
+        Err(_) => Err(input),
+    }
+}
+
+
+/******************************************************************
+This function returns a u32 after prompting the user for how many 
+trials that they want to simulate. This function handles bad input 
+and will not return until valid input is given.
+******************************************************************/
+fn get_num_trials() -> u32 {
+    // variable to store the number of trials that the user
+    // wants to simulate
+    let mut trials: u32 = Default::default();
+
+    // loop until valid input is given
+    while true {
+        // get user input
+        let input = get_input();
+
+        // use match to handle bad input
+        match input {
+            // if the input is a valid u32, set trials to input
+            // and break the loop
+            Ok(input) => {
+                trials = input;
+                break;
+            }
+
+            // otherwise print error message and loop again
+            Err(input) => {
+                println!("Error: \'{}\' is not a valid u32", input.trim())
+            }
+        }
+    }
+
+    // return the valid input
+    return trials;
+}
+
+
+
 
 fn main() {
-    //let boxes: Vec<i8> = (0..100).collect();
-    let boxes: Vec<i8> = (0..10).collect();
 
-    // make mutable copy of the boxes
-    let mut copy: Vec<i8> = boxes.clone();
+    let trials = get_num_trials();
+
+    println!("Simulating {} trials", trials);
     
-    // shuffle the boxes
-    copy.shuffle(&mut rand::thread_rng());
-
-    println!("copy = {:?}", copy);
-
-    let result = check_shuffle(copy);
-
-    println!("result = {}", result);
 }
+
+
+
+
+    // //let boxes: Vec<i8> = (0..100).collect();
+    // let boxes: Vec<i8> = (0..10).collect();
+
+    // // make mutable copy of the boxes
+    // let mut copy: Vec<i8> = boxes.clone();
+    
+    // // shuffle the boxes
+    // copy.shuffle(&mut rand::thread_rng());
+
+    // println!("copy = {:?}", copy);
+
+    // let result = check_shuffle(copy);
+
+    // println!("result = {}", result);
