@@ -9,7 +9,7 @@ This returns an i8 that is the length of the chain
 The highest value that this function will return is 51 
 as at that point finding the rest of the chain is redundant 
 ******************************************************************/
-fn discover_chain(boxes: Vec<i8>, index: i8, visited_boxes: &mut HashSet<i8>) -> i8{
+fn discover_chain(boxes: &Vec<i8>, index: i8, visited_boxes: &mut HashSet<i8>) -> i8 {
     // track the length of this chain
     // the minimum length of a chain is 1 (a box containing its own number)
     let mut length = 1;
@@ -43,15 +43,33 @@ fn discover_chain(boxes: Vec<i8>, index: i8, visited_boxes: &mut HashSet<i8>) ->
     return length;
 }
 
-
-fn find_chains(boxes: Vec<i8>){
+/******************************************************************
+This function takes in a vector representing the boxes and returns
+true if the prisoners will win the game or false if they will not
+******************************************************************/
+fn check_shuffle(boxes: Vec<i8>) -> bool {
     // create hashset to track which boxes have already been visited
     let mut visited_boxes: HashSet<i8> = HashSet::new();
+
+    // loop through each of the boxes
+    for index in 0..50{
+        
+        // check if the box is already been visited
+        // if it has been found, move to next iteration 
+        if visited_boxes.contains(&(index as i8)){
+            continue;
+        }
+
+        // check if the chain is longer than 50
+        // return false if it is as the prisoners will fail
+        if discover_chain(&boxes, index as i8, &mut visited_boxes) > 50 {
+            return false;
+        }
+    }
+
+    // return true if all chains are shorter than 50
+    return true;
 }
-
-
-
-
 
 
 
@@ -66,10 +84,8 @@ fn main() {
     copy.shuffle(&mut rand::thread_rng());
 
     println!("copy = {:?}", copy);
-    
-    let mut visited_boxes: HashSet<i8> = HashSet::new();
 
-    let result = discover_chain(copy, 0, &mut visited_boxes);
+    let result = check_shuffle(copy);
 
-    println!("the result is {}", result);
+    println!("result = {}", result);
 }
