@@ -1,36 +1,32 @@
 // use rand::seq::SliceRandom;
-// use std::collections::HashMap;
+use std::collections::HashMap;
 use std::io;
 // use num_cpus;
 
-
+/**********************************************************
+ * 
+**********************************************************/
 fn get_num_trials() -> usize {
-    //  value that we are returning
-    let mut trials: usize = Default::default();
+    
+    let mut trials: usize = 0;
 
-    // variable used to store input from user
-    let mut input = String::new();
-        
-    // loop until a valid input is given
     loop {
-        // prompt the user for how many trials they want to run
         println!("Enter the number of trials that you want to simulate: ");
-
-        // read input
+        
+        // get user input
+        let mut input: String = String::new();
         io::stdin().read_line(&mut input).expect("ERROR: Failed to read input.");
 
-        // match an whether the input can me 
+        // match on valid number 
         match input.trim().parse::<usize>(){
 
             // case for valid number given
             Ok(valid_number) => {
-                // set the number of trials to the valid number 
-                // given by the user
                 trials = valid_number;
                 break;
             }
 
-            // case for errir
+            // case for error
             Err(_) => {
                 // print error message and clear the string
                 println!("Error: \'{}\' is not a valid number", input.trim());
@@ -38,15 +34,26 @@ fn get_num_trials() -> usize {
             }
         }
     }
-
     // return the number of trials
     return trials;
 }
 
 
+// fn run_sim(boxes: HashMap<i8, i8>) -> bool {
+
+
+
+//     return false;
+// }
+
+
+
+
+
+
 fn main() {
-    
-    let trials = get_num_trials();
+    // get the number of trials that the user wants to simulate
+    let trials: usize = get_num_trials();
 
     println!("Running {} trials", trials);
 
