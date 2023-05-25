@@ -8,7 +8,7 @@ use std::io;
 **********************************************************/
 fn get_num_trials() -> usize {
     
-    let mut trials: usize = 0;
+    let trials: usize;
 
     loop {
         println!("Enter the number of trials that you want to simulate: ");
@@ -45,9 +45,6 @@ fn get_num_trials() -> usize {
 
 //     return false;
 // }
-
-
-
 
 
 
