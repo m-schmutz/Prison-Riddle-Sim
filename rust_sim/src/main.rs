@@ -8,7 +8,7 @@ use std::io;
 **********************************************************/
 fn get_num_trials() -> usize {
     
-    let trials: usize;
+    let mut trials: usize = 0;
 
     let mut num: usize = 0;
 
@@ -48,6 +48,9 @@ fn randomize_boxes() -> Vec<usize> {
 
     return randomized;
 }
+
+
+
 
 
 
