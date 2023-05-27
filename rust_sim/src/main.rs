@@ -6,7 +6,9 @@ use std::io;
 /**********************************************************
  * 
 **********************************************************/
-fn get_user_num() -> usize {
+fn get_num_trials() -> usize {
+    
+    let trials: usize;
 
     let mut num: usize = 0;
 
