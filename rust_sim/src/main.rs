@@ -1,4 +1,4 @@
-use rand::seq::SliceRandom;
+// use rand::seq::SliceRandom;
 use std::collections::HashMap;
 use std::io;
 // use num_cpus;
@@ -8,14 +8,13 @@ use std::io;
 **********************************************************/
 fn get_num_trials() -> usize {
     
-    let mut trials: usize = 0;
+    let trials: usize;
 
-    let mut num: usize = 0;
-
-    let mut input: String = String::new();
-    
-    // loop until user supplies a valid number
     loop {
+        println!("Enter the number of trials that you want to simulate: ");
+        
+        // get user input
+        let mut input: String = String::new();
         io::stdin().read_line(&mut input).expect("ERROR: Failed to read input.");
 
         // match on valid number 
@@ -23,7 +22,7 @@ fn get_num_trials() -> usize {
 
             // case for valid number given
             Ok(valid_number) => {
-                num = valid_number;
+                trials = valid_number;
                 break;
             }
 
@@ -35,34 +34,24 @@ fn get_num_trials() -> usize {
             }
         }
     }
-
-    return num;
+    // return the number of trials
+    return trials;
 }
 
 
-// fn randomize_boxes() -> HashMap<usize, usize> {
-fn randomize_boxes() -> Vec<usize> {
-    // randomize the box's numbers
-    let mut randomized: Vec<usize> = (0..100).collect();
-    randomized.shuffle(&mut rand::thread_rng());
-
-    return randomized;
-}
+// fn run_sim(boxes: HashMap<i8, i8>) -> bool {
 
 
 
+//     return false;
+// }
 
 
 
 fn main() {
     // get the number of trials that the user wants to simulate
-    println!("Enter the number of trials you want to simulate:");
-    let trials: usize = get_user_num();
+    let trials: usize = get_num_trials();
 
     println!("Running {} trials", trials);
-
-    let boxes: Vec<usize> = randomize_boxes();
-
-    println!("Boxes: {:?}", boxes);
 
 }
