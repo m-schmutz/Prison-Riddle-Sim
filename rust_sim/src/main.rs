@@ -39,12 +39,12 @@ fn get_num_trials() -> usize {
 }
 
 
-// fn run_sim(boxes: HashMap<i8, i8>) -> bool {
+fn run_trial(boxes: HashMap<i8, i8>) -> bool {
+    
 
 
-
-//     return false;
-// }
+    return false;
+}
 
 
 
