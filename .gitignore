@@ -3,4 +3,4 @@ __pycache__/
 .vscode
 faster_sim
 rust_sim/target
-rust_sim/Cargo.lock
+test.py

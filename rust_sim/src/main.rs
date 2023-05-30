@@ -1,12 +1,13 @@
-// use rand::seq::SliceRandom;
+use rand::seq::SliceRandom;
 use std::collections::HashMap;
+use std::hash::Hash;
 use std::io;
 // use num_cpus;
 
 /**********************************************************
  * 
 **********************************************************/
-fn get_num_trials() -> usize {
+fn _get_num_trials() -> usize {
     
     let trials: usize;
 
@@ -39,9 +40,25 @@ fn get_num_trials() -> usize {
 }
 
 
-fn run_trial(boxes: HashMap<i8, i8>) -> bool {
-    
+fn shuffle_boxes() -> HashMap<usize, usize> {
+    // shuffle the boxes
+    let mut randomized: Vec<usize> = (0..100).collect();
+    randomized.shuffle(&mut rand::thread_rng());
 
+
+    // convert the vector to a hashmap
+    let boxes = randomized.iter().enumerate().map(|(i, num)| (i, *num)).collect::<HashMap<usize, usize>>();
+
+    // return the hashmap
+    return boxes;
+}
+
+
+fn run_trial(boxes: HashMap<usize, usize>) -> bool {
+    // 
+    for (box_num, number) in boxes.iter(){
+        println!("box_num: {} | number: {}", box_num,  number);
+    }
 
     return false;
 }
@@ -50,8 +67,11 @@ fn run_trial(boxes: HashMap<i8, i8>) -> bool {
 
 fn main() {
     // get the number of trials that the user wants to simulate
-    let trials: usize = get_num_trials();
+    // let trials: usize = get_num_trials();
+    // println!("Running {} trials", trials);
 
-    println!("Running {} trials", trials);
+    let boxes = shuffle_boxes();
 
+    run_trial(boxes);
+    
 }
