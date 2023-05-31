@@ -47,7 +47,7 @@ fn shuffle_boxes() -> HashMap<usize, usize> {
     randomized.shuffle(&mut rand::thread_rng());
 
     // convert the vector to a hashmap
-    let boxes = randomized.iter().enumerate().map(|(i, num)| (i, *num)).collect::<HashMap<usize, usize>>();
+    let boxes: HashMap<usize, usize> = randomized.iter().enumerate().map(|(i, num)| (i, *num)).collect::<HashMap<usize, usize>>();
 
     // return the hashmap
     return boxes;
@@ -83,11 +83,11 @@ fn find_chain(boxes: &mut HashMap<usize, usize>, box_num: usize) -> bool {
 }
 
 
-fn run_trial(boxes: HashMap<usize, usize>) -> bool {
+fn run_trial() -> bool {
 
     let mut boxes: HashMap<usize, usize> = shuffle_boxes();
 
-    for (box_num, _) in boxes.iter() {
+    for box_num in 1..100 {
         if !find_chain(&mut boxes, box_num) {
             return false;
         }
@@ -105,8 +105,6 @@ fn main() {
     // let trials: usize = get_num_trials();
     // println!("Running {} trials", trials);
 
-    let boxes: HashMap<usize, usize> = shuffle_boxes();
-
-    run_trial(boxes);
+    run_trial();
     
 }
