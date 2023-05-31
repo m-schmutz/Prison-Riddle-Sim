@@ -84,20 +84,34 @@ fn find_chain(boxes: &mut HashMap<usize, usize>, box_num: usize) -> bool {
 
 
 fn run_trial() -> bool {
-
+    // create a new shuffle of boxes for this trial
     let mut boxes: HashMap<usize, usize> = shuffle_boxes();
 
+    // iterate through all the box numbers
     for box_num in 1..100 {
-        if !find_chain(&mut boxes, box_num) {
-            return false;
-        }
-        else if boxes.len() < 51 {
-            break;
+
+        // skip this iteration if the box number is already been
+        // discovered in another chain
+        if boxes.contains_key(&box_num) {
+
+            // find chain 
+            // return false if the chain is longer than 50
+            if !find_chain(&mut boxes, box_num) {
+                return false;
+            }
+            
+            // check if there are 50 or less boxes left
+            // in this case, the game is winning as the chains 
+            // left are <= 50
+            if boxes.len() < 51 {
+                break;
+            }
         }
     }
+
+    // return winning game
     return true;
 }
-
 
 
 fn main() {
