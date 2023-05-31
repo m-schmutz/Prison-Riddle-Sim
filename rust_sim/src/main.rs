@@ -83,23 +83,19 @@ fn find_chain(boxes: &mut HashMap<usize, usize>, box_num: usize) -> bool {
 }
 
 
-
-
-
-
-
 fn run_trial(boxes: HashMap<usize, usize>) -> bool {
 
-    let mut boxes = 0;
+    let mut boxes: HashMap<usize, usize> = shuffle_boxes();
 
-
-    // to check whether a given shuffle is winning or not
-    // we need to check if a chain longer than 50 exists
-    for (box_num, number) in boxes.iter(){
-        println!("box_num: {} | number: {}", box_num,  number);
+    for (box_num, _) in boxes.iter() {
+        if !find_chain(&mut boxes, box_num) {
+            return false;
+        }
+        else if boxes.len() < 51 {
+            break;
+        }
     }
-
-    return false;
+    return true;
 }
 
 
