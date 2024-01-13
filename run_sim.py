@@ -1,5 +1,5 @@
 #!/bin/python3
-from lib.simulation import *
+from py_src.simulation import get_num_trials, run_simulation
 
 if __name__ == '__main__':
     # get the number of trials to run
