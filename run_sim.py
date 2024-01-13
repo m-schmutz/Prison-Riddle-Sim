@@ -6,8 +6,8 @@ if __name__ == '__main__':
     trials = get_num_trials()
 
     # print out warning message
-    if trials >= 100000:
-        print('\033[33mWARNING: Recommend using C++ implementation for trials counts over 100,000\033[0m')
+    if trials >= 300000:
+        print('\033[33mWARNING: Python implementation not recommended for trial counts over 300,000\033[0m')
 
     # run the simulation
     run_simulation(trials)
