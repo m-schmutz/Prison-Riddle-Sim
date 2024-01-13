@@ -83,10 +83,6 @@ int run_trial(const __uint8_t* rbytes) {
     // randomize the box numbers
     randomize_boxes(boxes, rbytes);
 
-
-    print_boxes(rbytes);
-
-
     // current search number
     int search_number = 0;
 
